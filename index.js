@@ -1,5 +1,3 @@
-// 1. add count of task
-
 // getting primary color
 const root = document.documentElement;
 const primaryColor = getComputedStyle(root)
@@ -12,6 +10,22 @@ const CompletedElem = document.querySelector('#Completed'); //Complete Column
 const addTaskBtn = document.querySelector('#addTask'); //Add New Task Button
 
 let allTasks = JSON.parse(localStorage.getItem('Tasks')) || []; //All Tasks
+
+
+/* FN which Updates Tasks Count Value*/
+function updateCount(Tasks) {
+    const countElems = document.querySelectorAll('.count');
+    if (Tasks.length < 1) {
+        countElems.forEach(elem => elem.innerText = 0);
+        return;
+    }
+    Tasks.map(({ col }) => {
+        document.querySelector(`#${col}`).children[0].children[1].children[0].innerText++;
+    })
+
+}
+updateCount(allTasks); //add count onLoad If there are tasks in LocalStorage
+
 
 
 // initialising Current Dragging Task
@@ -52,12 +66,22 @@ function addEvntToCols(col) {
     });
     col.addEventListener('drop', (e) => {
         e.preventDefault();
+
+        //updating count before appending child because then both incCount and decCount will refer to current col in which it is dropped
+        let oldCol = draggingItem.closest('.task-column').getAttribute('id');
+        let incCount = document.querySelector(`#${col.getAttribute('id')}`).children[0].children[1].children[0]; //count which is going to ++
+        let decCount = document.querySelector(`#${oldCol}`).children[0].children[1].children[0]; //count which is going to --
+        incCount.innerText++;
+        decCount.innerText - 1 < 0 ? decCount.innerText = 0 : decCount.innerText--;
+
+
         col.appendChild(draggingItem);
         col.style.border = `2px dotted transparent`
         col.style.transform = 'scale(1)';
         let currTask = allTasks.find(task => task.title === draggingItem.children[0].innerText && task.desc === draggingItem.children[1].innerText); //getting the task which is being dragged
         currTask.col = col.getAttribute('id'); //setting up the column in which it is dropped
         saveToLocal(allTasks); //saving it in local storage
+
 
     })
 }
@@ -75,7 +99,7 @@ function deleteBtnEvntAdder() {
             const task = e.target.closest('.task'); // task which is being deleted
             const title = task.children[0].innerText;
             const desc = task.children[1].innerText;
-            const col = (task.closest('.task-column')).getAttribute('id'); //getting the column in which task is (completed/progress/ToDo)
+            const col = task.closest('.task-column').getAttribute('id'); //getting the column in which task is (completed/progress/ToDo)
 
             /* Finding that item in allTasks*/
             const index = allTasks.findIndex(taskItem =>
@@ -88,6 +112,7 @@ function deleteBtnEvntAdder() {
                 allTasks.splice(index, 1);
                 saveToLocal(allTasks); //uplaoding changes to local storage
                 task.remove();
+                document.querySelector(`#${col}`).children[0].children[1].children[0].innerText--;
             }
             return;
         })
@@ -129,20 +154,25 @@ modalBg.addEventListener('click', () => {
     newtaskContainer.classList.remove('active')
 })
 
+// adding New Task Event Listener
 addNewTaskBtn.addEventListener('click', (e) => {
+
+    // Getting Title And Description Elems
     const title = document.querySelector('.newTask-title');
     const desc = document.querySelector('.newTask-desc');
 
-    // if title is empty
+    // IF Title is Empty Give Eror
     if (title.value.trim() === '') {
         document.querySelector('.error-title').style.minHeight = "14px";
         document.querySelector('.error-title').textContent = "Title is required";
         return;
     }
-    // next time if error have still styles , remove them if user enters title before clicking the add Task btn
+
+    // IF next Time Before Clicking Add Task Btn user Enters Title this time but the Error Elem has still style, THEN remove them
     document.querySelector('.error-title').style.minHeight = "0px";
     document.querySelector('.error-title').textContent = '';
 
+    //creating New Elem for NEW TASK
     const div = document.createElement('div');
     div.classList.add('task');
     div.setAttribute('draggable', 'true');
@@ -152,14 +182,19 @@ addNewTaskBtn.addEventListener('click', (e) => {
                     <p>${desc.value}</p>
                     <button class="delete">Delete</button>`;
 
-    ToDoElem.appendChild(div);
-    allTasks.push({ title: title.value, desc: desc.value, col: `${ToDoElem.getAttribute('id')}` })
-    saveToLocal(allTasks);
+
+    ToDoElem.appendChild(div); //Add Task TO TO_DO INITIALLY
+
+    allTasks.push({ title: title.value, desc: desc.value, col: `${ToDoElem.getAttribute('id')}` });
+    saveToLocal(allTasks); //Update it to LOCAL STORAGE
     title.value = '';
     desc.value = '';
-    addDragStartEventOnTasks();
-    deleteBtnEvntAdder();
+    addDragStartEventOnTasks(); //Add DragStartEvent TO it
+    deleteBtnEvntAdder(); //Add Delete Btn Functionality to its Delete Btn Alos
     newtaskContainer.classList.remove('active');
+
+    //updating count
+    document.querySelector('#To-Do').children[0].children[1].children[0].innerText++;
 
 })
 /* ADDING NEW TASK RELATED LOGIC ENDS HERE */
