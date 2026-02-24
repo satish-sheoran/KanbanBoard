@@ -1,5 +1,4 @@
 // 1.new added task delete nhi ho rha h 
-// 2. agar title,desc bda h to columns ka width grwo ho rha h and it creates a scroll bar 
 
 // getting primary color
 const root = document.documentElement;
@@ -12,7 +11,6 @@ const ToDoElem = document.querySelector('#To-Do');
 const ProgressElem = document.querySelector('#Progress');
 const CompletedElem = document.querySelector('#Completed');
 const taskColumns = document.querySelectorAll('.task-column');
-const deleteBtn = document.querySelectorAll('.delete');
 const addTaskBtn = document.querySelector('#addTask');
 
 let allTasks = JSON.parse(localStorage.getItem('Tasks')) || [];
@@ -21,7 +19,7 @@ let allTasks = JSON.parse(localStorage.getItem('Tasks')) || [];
 // initialising the task which is being dragged
 let draggingItem;
 
-// Task loader in HTML
+// Task loader in HTML and this is main fn. 
 function TaskLoader() {
     allTasks.map(({ title, desc, col }) => {
 
@@ -35,7 +33,7 @@ function TaskLoader() {
         document.querySelector(`#${col}`).appendChild(div);
     })
     addDragStartEventOnTasks(); //now add drag event to all these tasks
-
+    deleteBtnEvntAdder(); //delete button working
 }
 
 TaskLoader();
@@ -91,12 +89,30 @@ addEvntToCols(ProgressElem)
 addEvntToCols(CompletedElem)
 
 //delete button working
-deleteBtn.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        e.target.closest('.task').remove();
+function deleteBtnEvntAdder() {
+    const deleteBtn = document.querySelectorAll('.delete');
+    deleteBtn.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const task = e.target.closest('.task'); // task which is being deleted
+            const title = task.children[0].innerText;
+            const desc = task.children[1].innerText;
+            const col = (task.closest('.task-column')).getAttribute('id'); //getting the column in which task is (completed/progress/ToDo)
 
+            /* Finding that item in allTasks*/
+            const index = allTasks.findIndex(taskItem =>
+                taskItem.title === title &&
+                taskItem.desc === desc &&
+                taskItem.col === col
+            );
+
+            if (index !== -1) {
+                allTasks.splice(index, 1);
+                saveToLocal(); //uplaoding changes to local storage
+            }
+            e.target.closest('.task').remove();
+        })
     })
-})
+}
 
 
 
@@ -144,6 +160,7 @@ addNewTaskBtn.addEventListener('click', (e) => {
     title.value = '';
     desc.value = '';
     addDragStartEventOnTasks();
+    deleteBtnEvntAdder();
     newtaskContainer.classList.remove('active');
 
 })
