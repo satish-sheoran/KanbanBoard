@@ -91,6 +91,7 @@ nav .right button:hover {
 }
 
 
+
 /* section */
 .container {
     display: flex;
@@ -103,7 +104,8 @@ nav .right button:hover {
 
 .container .task-column {
     display: flex;
-    flex-grow: 1;
+    width: calc(100% - 3vw - 60px);
+    /* flex-grow: 1; */
     flex-direction: column;
     background-color: rgba(37, 34, 34, 0.678);
     padding: var(--padding-m) var(--padding-l);
@@ -154,7 +156,7 @@ nav .right button:hover {
 .delete:hover {
     transform: scale(1.07) translateZ(0);
 }
-
+/* section */
 
 
 /* add new task section related */

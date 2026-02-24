@@ -1,6 +1,5 @@
 // 1.new added task delete nhi ho rha h 
-// 2. initial me items load kro local storage se
-// 3. agar title,desc bda h to columns ka width grwo ho rha h and it creates a scroll bar 
+// 2. agar title,desc bda h to columns ka width grwo ho rha h and it creates a scroll bar 
 
 // getting primary color
 const root = document.documentElement;
