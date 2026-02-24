@@ -19,7 +19,8 @@ html {
     --bg-button-color: #1a1a1a;
     --primary-text-color: #f4f4f4;
     --delete-btn-color: rgb(228, 15, 15);
-
+    --newTask-btn-color: #00000077;
+    --newTask-btn--light-color: #0303035d;
 
     /* padding bariables */
     --main-padding: 3vh 1.5vw 1vh 1.5vw;
@@ -83,6 +84,10 @@ nav .right button {
 
 nav .right button:hover {
     transform: scale(1.07) translateZ(0);
+}
+
+#addTask:active {
+    transform: scale(0.9);
 }
 
 
@@ -153,13 +158,76 @@ nav .right button:hover {
 
 
 /* add new task section related */
+.newtaskContainer.active {
+    display: flex;
+}
+
 .newtaskContainer {
     position: fixed;
+    display: none;
+    align-items: center;
+    justify-content: center;
     top: 0;
     left: 0;
     z-index: 1;
     height: 100vh;
     width: 100vw;
+
+}
+
+.modalBg {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
     background-color: rgba(65, 64, 64, 0.308);
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(10px);
+}
+
+.newTask {
+    display: flex;
+    width: 250px;
+    min-height: 140px;
+    z-index: 10;
+    flex-direction: column;
+    justify-content: center;
+    border-radius: var(--border-radius-s);
+    gap: var(--padding-m);
+    background-color: rgba(73, 72, 72, 0.521);
+    padding: var(--padding-m) var(--padding-l);
+}
+
+.newTask .newTask-title,
+.newTask textarea {
+    outline: none;
+    border: none;
+    resize: none;
+    font-weight: 500;
+    border-radius: var(--border-radius-s);
+    padding: var(--padding-s) var(--padding-s);
+}
+
+.newTask button {
+    align-self: center;
+    padding: var(--padding-s) var(--padding-m);
+    border: none;
+    outline: none;
+    font-weight: 600;
+    border-radius: var(--border-radius-s);
+    cursor: pointer;
+    background-color: var(--newTask-btn-color);
+    color: var(--primary-text-color);
+}
+
+.newTask button:hover {
+    transform: scale(1.07) translateZ(0);
+}
+
+
+
+
+/* error  */
+.error-title {
+    color: red;
+    font-size: 12px;
+    /* prevents layout shift */
 }
