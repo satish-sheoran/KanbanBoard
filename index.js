@@ -1,48 +1,30 @@
-// 1.new added task delete nhi ho rha h 
+// 1. add count of task
 
 // getting primary color
 const root = document.documentElement;
 const primaryColor = getComputedStyle(root)
     .getPropertyValue('--primary-color').trim();
 
-// getting all the elems
-// const tasks = document.querySelectorAll('.task');
-const ToDoElem = document.querySelector('#To-Do');
-const ProgressElem = document.querySelector('#Progress');
-const CompletedElem = document.querySelector('#Completed');
-const taskColumns = document.querySelectorAll('.task-column');
-const addTaskBtn = document.querySelector('#addTask');
+// getting All COLUMNS, New Task Button
+const ToDoElem = document.querySelector('#To-Do'); //TO-DO column
+const ProgressElem = document.querySelector('#Progress'); //Progress Column
+const CompletedElem = document.querySelector('#Completed'); //Complete Column
+const addTaskBtn = document.querySelector('#addTask'); //Add New Task Button
 
-let allTasks = JSON.parse(localStorage.getItem('Tasks')) || [];
+let allTasks = JSON.parse(localStorage.getItem('Tasks')) || []; //All Tasks
 
 
-// initialising the task which is being dragged
+// initialising Current Dragging Task
 let draggingItem;
 
-// Task loader in HTML and this is main fn. 
-function TaskLoader() {
-    allTasks.map(({ title, desc, col }) => {
-
-        const div = document.createElement('div');
-        div.classList.add('task');
-        div.setAttribute('draggable', 'true');
-
-        div.innerHTML = `<h2>${title}</h2>
-                    <p>${desc}</p>
-                   <button class="delete">Delete</button>`;
-        document.querySelector(`#${col}`).appendChild(div);
-    })
-    addDragStartEventOnTasks(); //now add drag event to all these tasks
-    deleteBtnEvntAdder(); //delete button working
+/* save to local storage FN */
+function saveToLocal(Tasks) {
+    localStorage.setItem('Tasks', JSON.stringify(Tasks))
 }
 
-TaskLoader();
-
-
-/* adding drag events to tasks */
+/* FN which Add DragStartEvent On All Tasks */
 function addDragStartEventOnTasks() {
-    const allTheTasks = document.querySelectorAll('.task');
-    allTheTasks.forEach(task => {
+    document.querySelectorAll('.task').forEach(task => {
         task.addEventListener('dragstart', (e) => {
             draggingItem = e.target;
         });
@@ -50,12 +32,7 @@ function addDragStartEventOnTasks() {
 }
 
 
-/* save to local storage fn */
-function saveToLocal() {
-    localStorage.setItem('Tasks', JSON.stringify(allTasks))
-}
-
-/* adding dragenter and dragleave event on all task columns */
+/* FN which adds DragEnter,DragLeave,DragOver,Drop Events Listeners on All COlumns */
 function addEvntToCols(col) {
     col.addEventListener('dragenter', (e) => {
         e.preventDefault();
@@ -80,17 +57,19 @@ function addEvntToCols(col) {
         col.style.transform = 'scale(1)';
         let currTask = allTasks.find(task => task.title === draggingItem.children[0].innerText && task.desc === draggingItem.children[1].innerText); //getting the task which is being dragged
         currTask.col = col.getAttribute('id'); //setting up the column in which it is dropped
-        saveToLocal(); //saving it in local storage
+        saveToLocal(allTasks); //saving it in local storage
 
     })
 }
+// instant adding Event Listener To All COLUMNS
 addEvntToCols(ToDoElem)
 addEvntToCols(ProgressElem)
 addEvntToCols(CompletedElem)
 
-//delete button working
+/* FN which adds Delete Functionality to All DELETE BUTTONS */
 function deleteBtnEvntAdder() {
     const deleteBtn = document.querySelectorAll('.delete');
+
     deleteBtn.forEach(btn => {
         btn.addEventListener('click', (e) => {
             const task = e.target.closest('.task'); // task which is being deleted
@@ -107,19 +86,39 @@ function deleteBtnEvntAdder() {
 
             if (index !== -1) {
                 allTasks.splice(index, 1);
-                saveToLocal(); //uplaoding changes to local storage
+                saveToLocal(allTasks); //uplaoding changes to local storage
+                task.remove();
             }
-            e.target.closest('.task').remove();
+            return;
         })
     })
 }
 
+/* Main FN which Loads All Tasks of Local Storage into HTML and Also Calls deleteBtnEvntAdder() and addDragStartEventOnTasks() which adds delete button Functionality and add DragStart Event Listener on Tasks Respectively */
+function TaskLoader() {
+    allTasks.map(({ title, desc, col }) => {
+
+        const div = document.createElement('div');
+        div.classList.add('task');
+        div.setAttribute('draggable', 'true');
+
+        div.innerHTML = `<h2>${title}</h2>
+                    <p>${desc}</p>
+                   <button class="delete">Delete</button>`;
+        document.querySelector(`#${col}`).appendChild(div);
+    })
+    addDragStartEventOnTasks(); //now add drag event to all these tasks
+    deleteBtnEvntAdder(); //delete button working
+}
+TaskLoader(); // calling istantly
 
 
-/* new task add related */
-const addNewTaskBtn = document.querySelector('#addNewTask');
-const newtaskContainer = document.querySelector('.newtaskContainer');
-const modalBg = document.querySelector('.modalBg');
+
+
+/* ADDING NEW TASK RELATED LOGIC STARTS HERE : */
+const addNewTaskBtn = document.querySelector('#addNewTask'); //adding the Task Btn
+const newtaskContainer = document.querySelector('.newtaskContainer'); //container 
+const modalBg = document.querySelector('.modalBg'); // basically a layer used for blur and cancel adding task
 
 
 addTaskBtn.addEventListener('click', (e) => {
@@ -128,7 +127,6 @@ addTaskBtn.addEventListener('click', (e) => {
 
 modalBg.addEventListener('click', () => {
     newtaskContainer.classList.remove('active')
-
 })
 
 addNewTaskBtn.addEventListener('click', (e) => {
@@ -156,7 +154,7 @@ addNewTaskBtn.addEventListener('click', (e) => {
 
     ToDoElem.appendChild(div);
     allTasks.push({ title: title.value, desc: desc.value, col: `${ToDoElem.getAttribute('id')}` })
-    saveToLocal();
+    saveToLocal(allTasks);
     title.value = '';
     desc.value = '';
     addDragStartEventOnTasks();
@@ -164,4 +162,4 @@ addNewTaskBtn.addEventListener('click', (e) => {
     newtaskContainer.classList.remove('active');
 
 })
-/**New Task add Related */
+/* ADDING NEW TASK RELATED LOGIC ENDS HERE */
