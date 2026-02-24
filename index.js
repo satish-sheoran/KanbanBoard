@@ -22,7 +22,27 @@ let allTasks = JSON.parse(localStorage.getItem('Tasks')) || [];
 // initialising the task which is being dragged
 let draggingItem;
 
-// adding drag events to tasks
+// Task loader in HTML
+function TaskLoader() {
+    allTasks.map(({ title, desc, col }) => {
+
+        const div = document.createElement('div');
+        div.classList.add('task');
+        div.setAttribute('draggable', 'true');
+
+        div.innerHTML = `<h2>${title}</h2>
+                    <p>${desc}</p>
+                   <button class="delete">Delete</button>`;
+        document.querySelector(`#${col}`).appendChild(div);
+    })
+    addDragStartEventOnTasks(); //now add drag event to all these tasks
+
+}
+
+TaskLoader();
+
+
+/* adding drag events to tasks */
 function addDragStartEventOnTasks() {
     const allTheTasks = document.querySelectorAll('.task');
     allTheTasks.forEach(task => {
@@ -32,14 +52,13 @@ function addDragStartEventOnTasks() {
     })
 }
 
-addDragStartEventOnTasks();
 
-//save to local storage fn
+/* save to local storage fn */
 function saveToLocal() {
     localStorage.setItem('Tasks', JSON.stringify(allTasks))
 }
 
-// adding dragenter and dragleave event on all task columns
+/* adding dragenter and dragleave event on all task columns */
 function addEvntToCols(col) {
     col.addEventListener('dragenter', (e) => {
         e.preventDefault();
